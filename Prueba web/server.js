@@ -5,6 +5,11 @@ const allInputs = document.querySelectorAll('#form input, #form textarea, #form 
 formulario.addEventListener('submit', function(event) {
     event.preventDefault();
 
+    const mensajePrevio = document.getElementById('mensaje-exito');
+    if (mensajePrevio) {
+        mensajePrevio.remove();
+    }
+
     const Nombre = document.getElementById('Nombre').value;
     const Email = document.getElementById('Email').value;
     const Telefono = document.getElementById('Telefono').value;
@@ -22,36 +27,48 @@ formulario.addEventListener('submit', function(event) {
         mensaje: Mensaje
     };
 
-    fetch('Datos.json', { 
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(datosFormulario)
-    })
-    .then (respuesta=> {
-        if (!respuesta.ok) throw new Error('Error en el servidor');
+        fetch('Datos.json') 
+    .then(respuesta => {
+        if (!respuesta.ok) throw new Error('Error al conectar con el origen de datos');
         return respuesta.json();
     })
-    .then (datos => {
-        console.log('Exito', datos);
-        alert ('¡Datos enviados correctamente!');
+    .then(datos => {
+        // Mostramos en consola los datos que consumimos del JSON local
+        console.log('Datos consumidos del JSON con éxito:', datos);
+        const alertaExito = document.createElement('div');
+        alertaExito.id = 'mensaje-exito';
+        alertaExito.textContent = '¡Datos procesados correctamente con el JSON local!';
+        
+        // Vincula el elemento con las clases de tu archivo CSS
+        alertaExito.classList.add('mensaje-alerta', 'exito'); 
+
+        // Insertar el elemento en el DOM (Uso de append)
+        formulario.append(alertaExito);
+
         formulario.reset();
     })
-    .catch (error => {
+    .catch(error => {
         console.error('Error:', error);
-        alert('ERROR: no se pudo procesar el envio')
+        const alertaError = document.createElement('div');
+        alertaError.id = 'mensaje-error'; 
+        alertaError.textContent = 'ERROR: no se pudo procesar el envío';
+        
+        // Vincula el elemento con tus clases de CSS de error
+        alertaError.classList.add('mensaje-alerta', 'error');
+        
+        formulario.append(alertaError);
     });
 });
 
 botonEnviar.addEventListener('click', function() {
-    Console.Log('El usuario hizo click en el boton enviar');
+    console.log('El usuario hizo click en el botón enviar');
 });
 
 allInputs.forEach(campo => {
     campo.addEventListener('invalid', function() {
         this.style.borderColor = 'red';
-        console.warn('El campo' + this.ID + ' es requerido y se debe rellenar');
+        // Corrección: Añadido espacio en el string 'El campo '
+        console.warn('El campo ' + this.id + ' es requerido y se debe rellenar');
     });
 
     campo.addEventListener('input', function() {
